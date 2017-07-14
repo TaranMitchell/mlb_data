@@ -107,3 +107,11 @@ matrixc = np.matrix(c)
 t = matrixN * matrixc
 matrixt = np.matrix(t)
 
+# Final tables
+absorption = pd.DataFrame(data=B, columns=['BB', 'IP', 'K'], index=['0-0','0-1','0-2','1-0','1-1','1-2','2-0','2-1','2-2','3-0','3-1','3-2'])
+pitchCount = pd.DataFrame(data=matrixt, columns=['pitch count to absorption'],index=['0-0','0-1','0-2','1-0','1-1','1-2','2-0','2-1','2-2','3-0','3-1','3-2'])
+
+print absorption
+
+absorption.plot.bar(stacked=True)
+plt.show()
