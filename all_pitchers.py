@@ -14,6 +14,11 @@ from numpy.linalg import inv
  
 # Assign the filename: file
 file = 'pitchSequence_2016.csv'
+
+# Begin building controls on what data to return
+lastName = raw_input("Enter pitcher's last name: ")
+firstName = raw_input("Enter pitcher's first name: ")
+print "Building markov chain for " + firstName + " " + lastName + " now. . . "
  
 # Read the file into a DataFrame: df
 df = pd.read_csv(file)
@@ -113,5 +118,11 @@ matrixc = np.matrix(c)
 t = matrixN * matrixc
 matrixt = np.matrix(t)
 
+# Final tables
+absorption = pd.DataFrame(data=B, columns=['BB', 'IP', 'K'], index=['0-0','0-1','0-2','1-0','1-1','1-2','2-0','2-1','2-2','3-0','3-1','3-2'])
+pitchCount = pd.DataFrame(data=matrixt, columns=['pitch count to absorption'],index=['0-0','0-1','0-2','1-0','1-1','1-2','2-0','2-1','2-2','3-0','3-1','3-2'])
 
+print absorption
 
+absorption.plot.bar(stacked=True)
+plt.show()
