@@ -19,7 +19,10 @@ file = 'pitchSequence_2016.csv'
 df = pd.read_csv(file)
 
 state = df.loc[:,['startingBalls','startingStrikes','balls','strikes','hitlocation']]
-state['strikes'].value_counts()
+# due to 4-x and x-3 counts in result table
+# there are events that happen AFTER the walk or strike out - need to remove those from Starting State
+state = state.drop(state[state['startingStrikes'] == 3].index)
+state = state.drop(state[state['startingBalls'] == 4].index)
 
 state['startState']=state['startingBalls'].astype(str)+'-'+state['startingStrikes'].astype(str)
 
@@ -74,8 +77,41 @@ index=['BB', 'IP', 'K'])
 
 result = clean.append(extra_rows)
 
-# BREAKS HERE: Wrong number of items passed 15, placement implies 21
-# due to 4-x and x-3 counts in result table
 # missing 0-0 as end state so that the matrix is 15x15 square
 result['0-0'] = pd.Series([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], index=result.index)
+
+
+#manually reorder columns
+result = result[['0-0','0-1','0-2','1-0','1-1','1-2','2-0','2-1','2-2','3-0','3-1','3-2','BB','IP','K']]
+
+# I is an r-by-r identity matrix, 0 is an r-by-t zero matrix, R is a
+# nonzero t-by-r matrix, and Q is an t-by-t matrix
+
+#Transient matrix Q
+Q = result.iloc[0:12,0:12]
+matrixQ = np.matrix(Q)
+
+# Absorption matrix R
+R = result.iloc[0:12,12:15]
+matrixR = np.matrix(R)
+
+# Transient Identity matrix I
+I = np.identity(12)
+matrixI = np.matrix(I)
+
+#fundamental matrix N = (I − Q)^-1
+test = matrixI - matrixQ
+N = inv(np.matrix(test))
+matrixN = np.matrix(N)
+
+# Absorption matrix B = NR
+B = matrixN * matrixR
+
+c = [[1],[1],[1],[1],[1],[1],[1],[1],[1],[1],[1],[1]]
+matrixc = np.matrix(c)
+
+t = matrixN * matrixc
+matrixt = np.matrix(t)
+
+
 
